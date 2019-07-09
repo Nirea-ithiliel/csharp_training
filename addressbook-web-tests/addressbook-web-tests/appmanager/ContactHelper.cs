@@ -35,6 +35,37 @@ namespace WebAddressbookTests
             };
         }
 
+        public void AddContactToGroup(ContactData contact, GroupData group)
+        {
+            manager.Navigator.GoToHomePage();
+            ClearGroupFilter();
+            SelectContact(contact.Id);
+            SelectGroupToAdd(group.Name);
+            CommitAddingContactToGroup();
+            new WebDriverWait(driver, TimeSpan.FromSeconds(10))
+                .Until(d => d.FindElements(By.CssSelector("div.msgbox")).Count > 0);
+        }
+
+        private void CommitAddingContactToGroup()
+        {
+            driver.FindElement(By.Id("add")).Click();
+        }
+
+        private void SelectGroupToAdd(string name)
+        {
+            new SelectElement(driver.FindElement(By.Name("to_group"))).SelectByText(name);
+        }
+
+        private void SelectContact(string contactId)
+        {
+            driver.FindElement(By.Id(contactId)).Click();
+        }
+
+        private void ClearGroupFilter()
+        {
+            new SelectElement(driver.FindElement(By.Name("group"))).SelectByText("[all]");
+        }
+
         public ContactData GetContactInformationFromEditForm(int index)
         {
             manager.Navigator.GoToHomePage();
@@ -48,7 +79,7 @@ namespace WebAddressbookTests
             string mobilePhone = driver.FindElement(By.Name("mobile")).GetAttribute("value");
             string workPhone = driver.FindElement(By.Name("work")).GetAttribute("value");
 
-           return new ContactData(firstName, lastName)
+            return new ContactData(firstName, lastName)
             {
                 Address = address,
                 HomePhone = homePhone,
